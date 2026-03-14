@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+    <title>نظام إنارة الشوارع الذكي | تقليل استهلاك الطاقة</title>
+    <!-- Font Awesome 6 (مجاني) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js للرسوم المتحركة -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: #eef2f6;
+            color: #13294b;
+            line-height: 1.5;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 3rem;
+            box-shadow: 0 30px 60px rgba(0,20,40,0.25);
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        /* هيدر محدث */
+        .tech-header {
+            background: linear-gradient(145deg, #021d2b 0%, #124c63 100%);
+            color: white;
+            padding: 3rem 2.5rem;
+            border-bottom: 6px solid #f9c74f;
+        }
+        .header-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .title-main h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            text-shadow: 0 5px 12px rgba(0,0,0,0.3);
+        }
+        .title-main h1 i {
+            color: #f9c74f;
+            margin-left: 1rem;
+        }
+        .badge-pill {
+            background: #f9c74f;
+            color: #021d2b;
+            padding: 0.6rem 2rem;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            box-shadow: 0 8px 18px black;
+        }
+
+        /* شريط التنقل اللاصق */
+        .sticky-nav {
+            background: #1d4f63;
+            padding: 0.9rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+            justify-content: center;
+            border-bottom: 3px solid #f9c74f;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            backdrop-filter: blur(12px);
+            background: rgba(29,79,99,0.9);
+        }
+        .sticky-nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 0;
+            border-bottom: 3px solid transparent;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sticky-nav a:hover {
+            border-bottom-color: #f9c74f;
+            color: #ffe083;
+        }
+
+        /* كل قسم يظهر كصفحة منفصلة مع مسافة وخلفية */
+        .section-page {
+            background: white;
+            border-radius: 4rem;
+            padding: 2.8rem 2.8rem;
+            margin: 3rem 2rem;
+            box-shadow: 0 20px 35px rgba(0,40,60,0.1);
+            border: 1px solid #e9f0f5;
+            transition: transform 0.2s;
+            scroll-margin-top: 80px;
+        }
+        .section-page:hover {
+            box-shadow: 0 30px 45px rgba(0,60,80,0.15);
+        }
+
+        .section-head {
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin-bottom: 2.2rem;
+            border-right: 10px solid #f9c74f;
+            padding-right: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #03222e;
+        }
+        .section-head i {
+            color: #f9c74f;
+            font-size: 2.5rem;
+        }
+
+        /* دمج المشكلة والحل في بطاقات */
+        .problem-solution-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+            margin-top: 1.5rem;
+        }
+        .prob-sol-card {
+            background: #f4f9ff;
+            border-radius: 2.5rem;
+            padding: 2rem 2rem;
+            border: 2px solid #bdd8e8;
+        }
+        .prob-sol-card h3 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 10px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.8rem;
+            margin: 1.5rem 0;
+        }
+        .mini-card {
+            background: #ffffffd9;
+            border-radius: 2rem;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            box-shadow: 0 8px 16px #c8dae5;
+        }
+
+        /* جدول وجراف تفاعلي */
+        .data-card {
+            background: #e7f0f7;
+            border-radius: 3rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            background: white;
+            border-radius: 2rem;
+            overflow: hidden;
+        }
+        th {
+            background: #021d2b;
+            color: white;
+            padding: 1rem;
+        }
+        td {
+            padding: 0.9rem;
+            border-bottom: 1px solid #cddde9;
+        }
+
+        /* مخطط الشبكة مع خيار ملء الشاشة */
+        .network-wrapper {
+            position: relative;
+            background: #d2e4f0;
+            border-radius: 3.5rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .fullscreen-btn {
+            position: absolute;
+            top: 1.5rem;
+            left: 2rem;
+            background: #021d2b;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 0.8rem 1.8rem;
+            cursor: pointer;
+            z-index: 50;
+            font-size: 1.1rem;
+        }
+        .interactive-svg {
+            width: 100%;
+            height: auto;
+            background: #c2d9e8;
+            border-radius: 2.5rem;
+            padding: 1rem;
+            cursor: pointer;
+        }
+
+        /* لوحة IoT */
+        .iot-dashboard {
+            background: linear-gradient(135deg, #0b2b39, #011c27);
+            border-radius: 3.5rem;
+            padding: 2.5rem;
+            color: white;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 2rem;
+        }
+        .metric-card {
+            background: #ffffff15;
+            backdrop-filter: blur(6px);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #f9c74f;
+        }
+
+        /* زر التحميل الكيوت */
+        .download-section {
+            background: #eef5f9;
+            border-radius: 4rem;
+            padding: 3rem;
+        }
+        .file-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+            justify-content: center;
+        }
+        .file-card {
+            background: white;
+            border-radius: 2.5rem;
+            width: 220px;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.1);
+            transition: 0.25s;
+        }
+        .file-card:hover {
+            transform: scale(1.05) rotate(0.5deg);
+            box-shadow: 0 20px 30px #021d2b30;
+        }
+        .btn-download {
+            background: #f9c74f;
+            border: none;
+            color: #021d2b;
+            font-weight: 800;
+            padding: 1rem 2rem;
+            border-radius: 40px;
+            font-size: 1.2rem;
+            margin-top: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #b57c1a;
+            transition: 0.1s;
+        }
+        .btn-download:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        /* مودال الرمز (بدون عرض الرمز) */
+        .password-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,20,40,0.9);
+            backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .modal-content {
+            background: white;
+            padding: 2.8rem;
+            border-radius: 4rem;
+            width: 380px;
+            text-align: center;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 1.2rem;
+            margin: 2rem 0;
+            border-radius: 60px;
+            border: 2px solid #124c63;
+            text-align: center;
+            font-size: 1.4rem;
+        }
+        .modal-btn {
+            background: #124c63;
+            color: white;
+            border: none;
+            padding: 1rem 2.2rem;
+            border-radius: 50px;
+            font-weight: bold;
+            margin: 0 0.5rem;
+        }
+
+        /* رابط المحاكاة */
+        .sim-link-box {
+            background: #021d2b;
+            border-radius: 5rem;
+            padding: 3rem;
+            text-align: center;
+            color: white;
+        }
+        .game-btn {
+            background: #f9c74f;
+            color: #021d2b;
+            border: none;
+            padding: 1.5rem 4rem;
+            border-radius: 80px;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-top: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 20px;
+            text-decoration: none;
+        }
+
+        footer {
+            background: #02111f;
+            color: #bdd7e6;
+            padding: 2.5rem;
+            text-align: center;
+            border-top: 3px solid #f9c74f;
+        }
+        @media (max-width: 700px) {
+            .section-page { margin: 1.5rem; padding: 1.8rem; }
+            .problem-solution-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- الهيدر -->
+    <div class="tech-header">
+        <div class="header-content">
+            <div class="title-main">
+                <h1><i class="fas fa-lightbulb"></i> نظام إنارة الشوارع الذكي<br><span style="font-size:1.8rem;">لتقليل استهلاك الطاقة</span></h1>
+            </div>
+            <div class="badge-pill"><i class="fas fa-solar-panel"></i> IoT | AI | NET ZERO</div>
+        </div>
+    </div>
+
+    <!-- شريط التنقل -->
+    <div class="sticky-nav">
+        <a href="#problem-solution"><i class="fas fa-circle-info"></i> المشكلة والحل</a>
+        <a href="#data"><i class="fas fa-chart-line"></i> جمع المعلومات</a>
+        <a href="#network"><i class="fas fa-diagram-project"></i> بنية الشبكة</a>
+        <a href="#iot"><i class="fas fa-table-cells-large"></i> لوحة التحكم</a>
+        <a href="#sim"><i class="fas fa-gamepad"></i> المحاكاة</a>
+        <a href="#download"><i class="fas fa-download"></i> ملفات المشروع</a>
+    </div>
+
+    <!-- المحتوى الرئيسي (كل قسم صفحة مستقلة) -->
+
+    <!-- 1. المشكلة والحل مدمجين -->
+    <section id="problem-solution" class="section-page">
+        <div class="section-head"><i class="fas fa-microchip"></i> <span>المشكلة والحل الذكي</span></div>
+        <div class="problem-solution-grid">
+            <div class="prob-sol-card">
+                <h3><i class="fas fa-exclamation-triangle" style="color:#bb2e2e;"></i> المشكلة</h3>
+                <div class="card-grid">
+                    <div class="mini-card"><i class="fas fa-bolt fa-2x"></i><h4>هدر الطاقة</h4><p>إضاءة تقليدية تعمل 12 ساعة بكامل الطاقة حتى بلا حركة.</p></div>
+                    <div class="mini-card"><i class="fas fa-money-bill-wave fa-2x"></i><h4>تكاليف باهظة</h4><p>70% من فاتورة الكهرباء البلدية تذهب للإنارة.</p></div>
+                    <div class="mini-card"><i class="fas fa-clock fa-2x"></i><h4>صيانة متأخرة</h4><p>غياب المراقبة اللحظية يطيل زمن الإصلاح.</p></div>
+                    <div class="mini-card"><i class="fas fa-cloud fa-2x"></i><h4>بصمة كربونية</h4><p>انبعاثات عالية من محطات التوليد.</p></div>
+                </div>
+            </div>
+            <div class="prob-sol-card">
+                <h3><i class="fas fa-lightbulb" style="color:#f9c74f;"></i> الحل</h3>
+                <div class="card-grid">
+                    <div class="mini-card"><i class="fas fa-solar-panel fa-2x"></i><h4>طاقة شمسية</h4><p>كل عمود مزود بلوح وبطارية.</p></div>
+                    <div class="mini-card"><i class="fas fa-person-walking fa-2x"></i><h4>حساسات حركة</h4><p>تضيء فقط عند المرور.</p></div>
+                    <div class="mini-card"><i class="fas fa-wifi fa-2x"></i><h4>IoT Gateway</h4><p>مراقبة وتحكم عن بعد.</p></div>
+                    <div class="mini-card"><i class="fas fa-chart-line fa-2x"></i><h4>صيانة تنبؤية</h4><p>اكتشاف الأعطال فوراً.</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. قسم جمع المعلومات (دراسة الجدوى) بشكل تفاعلي -->
+    <section id="data" class="section-page">
+        <div class="section-head"><i class="fas fa-chart-simple"></i> <span>جمع المعلومات – دراسة الجدوى</span></div>
+        <div class="data-card">
+            <canvas id="savingsChart" style="width:100%; max-height:300px; height:280px;"></canvas>
+            <table style="margin-top:2rem;">
+                <tr><th>المدينة / المشروع</th><th>توفير الطاقة</th><th>تفاصيل</th></tr>
+                <tr><td>جايبور، الهند (Tvilight)</td><td>55%</td><td>توفير 405 طن CO₂/سنوياً</td></tr>
+                <tr><td>كوبنهاغن، الدنمارك (CITELUM)</td><td>57%</td><td>12,000 عمود ذكي</td></tr>
+                <tr><td>لوس أنجلوس، أمريكا (PHILIPS)</td><td>63%</td><td>توفير 40% طاقة + صيانة استباقية</td></tr>
+                <tr><td>جوندالوب، أستراليا (Telensa)</td><td>65%</td><td>1,800 عمود</td></tr>
+                <tr><td>مسقط، عُمان (تقديري)</td><td>45%</td><td>حسب ظروف الإشعاع الشمسي</td></tr>
+            </table>
+            <!-- ملاحظة المصادر بشكل غير بارز -->
+            <div style="font-size:0.9rem; color:#2f5b70; margin-top:1.5rem; background:#fff; padding:1rem; border-radius:60px;">
+                <i class="fas fa-database"></i> بناءً على تقارير Telensa, Tvilight, Philips, IEEE.
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. بنية الشبكة التفاعلية + خيار ملء الشاشة -->
+    <section id="network" class="section-page">
+        <div class="section-head"><i class="fas fa-network-wired"></i> <span>بنية الشبكة التفاعلية</span></div>
+        <div class="network-wrapper" id="networkWrapper">
+            <button class="fullscreen-btn" id="fullscreenBtn"><i class="fas fa-expand"></i> ملء الشاشة</button>
+            <svg class="interactive-svg" id="networkSvg" viewBox="0 0 700 280" style="background:#c2d9e8;">
+                <!-- سحابة الانترنت -->
+                <ellipse cx="70" cy="60" rx="60" ry="30" fill="#e1f0fa" stroke="#03222e" stroke-width="2" />
+                <text x="40" y="70" fill="#021d2b" font-size="12">الإنترنت</text>
+                <!-- مودم -->
+                <rect x="160" y="40" width="70" height="40" rx="12" fill="#f9c74f" />
+                <text x="175" y="68" fill="#021d2b" font-size="11">مودم</text>
+                <!-- موجه + بوابة IoT -->
+                <rect x="270" y="25" width="100" height="70" rx="20" fill="#8fc4d9" />
+                <text x="295" y="55" fill="#021d2b" font-size="11">موجه/بوابة</text>
+                <text x="295" y="75" fill="#021d2b" font-size="9">IoT</text>
+                <!-- أعمدة مع ألواح شمسية -->
+                <circle cx="430" cy="60" r="24" fill="#1e5d77" />
+                <text x="415" y="68" fill="white" font-size="10">عمود</text>
+                <polygon points="430,20 440,35 420,35" fill="#f9c74f" /> <!-- لوح شمسي صغير -->
+                <circle cx="530" cy="120" r="24" fill="#1e5d77" />
+                <text x="515" y="128" fill="white" font-size="10">عمود</text>
+                <polygon points="530,80 540,95 520,95" fill="#f9c74f" />
+                <circle cx="610" cy="60" r="24" fill="#1e5d77" />
+                <text x="595" y="68" fill="white" font-size="10">عمود</text>
+                <polygon points="610,20 620,35 600,35" fill="#f9c74f" />
+                <!-- حساسات صغيرة -->
+                <circle cx="470" cy="180" r="14" fill="#a4c3d9" /><text x="457" y="188" fill="#021d2b">حساس</text>
+                <circle cx="560" cy="190" r="14" fill="#a4c3d9" /><text x="547" y="198" fill="#021d2b">حساس</text>
+                <!-- مشغل (ريلاي) -->
+                <rect x="350" y="170" width="40" height="25" rx="8" fill="#b8a2c6" /><text x="355" y="190" fill="#021d2b">مشغل</text>
+                <!-- خطوط الاتصال -->
+                <line x1="130" y1="60" x2="160" y2="60" stroke="#333" stroke-width="2" />
+                <line x1="230" y1="60" x2="270" y2="60" stroke="#333" stroke-width="2" />
+                <line x1="370" y1="60" x2="406" y2="60" stroke="#333" stroke-width="2" />
+                <line x1="454" y1="80" x2="454" y2="170" stroke="#333" stroke-dasharray="5" />
+                <line x1="554" y1="140" x2="560" y2="180" stroke="#333" stroke-dasharray="5" />
+                <!-- وصف تفاعلي عبر title (يظهر عند التحويم) -->
+                <title>شبكة إنترنت الأشياء - انقر على أي عنصر لرؤية التفاصيل</title>
+            </svg>
+        </div>
+        <p style="text-align:center;"><i class="fas fa-mouse-pointer"></i> اضغط على العناصر داخل المخطط لعرض التفاصيل (انقر على أي جزء).</p>
+    </section>
+
+    <!-- 4. لوحة تحكم IoT -->
+    <section id="iot" class="section-page">
+        <div class="section-head"><i class="fas fa-table-cells-large"></i> <span>لوحة تحكم IoT (محاكاة)</span></div>
+        <div class="iot-dashboard">
+            <div class="dashboard-grid">
+                <div class="metric-card"><i class="fas fa-lightbulb fa-2x"></i><div class="metric-value" id="totalLamps">1,284</div><div>الأعمدة النشطة</div></div>
+                <div class="metric-card"><i class="fas fa-bolt fa-2x"></i><div class="metric-value" id="powerSaved">63<span style="font-size:1.5rem;">%</span></div><div>توفير الطاقة</div></div>
+                <div class="metric-card"><i class="fas fa-tree fa-2x"></i><div class="metric-value" id="co2Saved">1.42<span style="font-size:1.2rem;"> طن</span></div><div>خفض CO₂/يوم</div></div>
+                <div class="metric-card"><i class="fas fa-coins fa-2x"></i><div class="metric-value" id="omrSaved">3,250<span style="font-size:1rem;"> ر.ع</span></div><div>توفير شهري</div></div>
+            </div>
+            <p style="text-align:center; margin-top:2rem;"><i class="fas fa-sync-alt fa-spin"></i> بيانات حية تعتمد على محاكاة الأداء</p>
+        </div>
+    </section>
+
+    <!-- 5. قسم المحاكاة (رابط فقط) -->
+    <section id="sim" class="section-page">
+        <div class="section-head"><i class="fas fa-gamepad"></i> <span>محاكاة إنارة الشارع</span></div>
+        <div class="sim-link-box">
+            <i class="fas fa-car-side fa-3x"></i>
+            <h2 style="font-size:2.5rem; margin:1rem 0;">لعبة المحاكاة التفاعلية</h2>
+            <p>جرب نظام الإضاءة الذكي بنفسك من خلال لعبة المحاكاة.</p>
+            <a href="#" class="game-btn" onclick="alert('سيتم نقلك إلى لعبة المحاكاة (قيد التطوير).')"><i class="fas fa-play"></i> ابدأ المحاكاة</a>
+        </div>
+    </section>
+
+    <!-- 6. ملفات المشروع المحمية (الرمز 6024 بدون ذكر) -->
+    <section id="download" class="section-page download-section">
+        <div class="section-head"><i class="fas fa-download"></i> <span>ملفات المشروع</span></div>
+        <div class="file-grid">
+            <div class="file-card">
+                <i class="fas fa-file-word fa-4x"></i>
+                <h3>المشروع الأول (التخطيط)</h3>
+                <button class="btn-download" onclick="requestFile('plan')"><i class="fas fa-download"></i> تحميل</button>
+            </div>
+            <div class="file-card">
+                <i class="fas fa-file-code fa-4x"></i>
+                <h3>المشروع الثاني (المحاكاة)</h3>
+                <button class="btn-download" onclick="requestFile('simfile')"><i class="fas fa-download"></i> تحميل</button>
+            </div>
+            <div class="file-card">
+                <i class="fas fa-network-wired fa-4x"></i>
+                <h3>برنامج المحاكاة (Packet Tracer)</h3>
+                <button class="btn-download" onclick="requestFile('pkt')"><i class="fas fa-download"></i> تحميل</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- footer محدث حسب الطلب -->
+    <footer>
+        <p>مشروع نظام إنارة الشوارع الذكي – جميع البيانات مستندة إلى مصادر موثوقة (Telensa, Tvilight, IEEE).</p>
+        <p>جميع الحقوق محفوظة للمنشأ – إعداد: حامد خالد الناصري</p>
+    </footer>
+</div>
+
+<!-- مودال إدخال الرمز (الرمز 6024 لا يظهر في الموقع) -->
+<div id="passwordModal" class="password-modal">
+    <div class="modal-content">
+        <i class="fas fa-lock" style="font-size:3rem; color:#124c63;"></i>
+        <h3>أدخل رمز التحميل</h3>
+        <input type="password" id="passwordInput" placeholder="****" maxlength="6">
+        <div>
+            <button class="modal-btn" onclick="verifyPassword()"><i class="fas fa-check"></i> تأكيد</button>
+            <button class="modal-btn" style="background:#999;" onclick="closeModal()">إلغاء</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // الرسم البياني المتحرك
+    window.onload = function() {
+        const ctx = document.getElementById('savingsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['جايبور', 'كوبنهاغن', 'لوس أنجلوس', 'جوندالوب', 'مسقط'],
+                datasets: [{
+                    label: 'نسبة توفير الطاقة %',
+                    data: [55, 57, 63, 65, 45],
+                    backgroundColor: ['#f9c74f', '#f9a74f', '#4fa6f9', '#4fc1a5', '#b48bf0'],
+                    borderRadius: 12
+                }]
+            },
+            options: {
+                responsive: true,
+                animation: { duration: 1600 },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // تحديث لوحة IoT بشكل دوري
+        setInterval(() => {
+            document.getElementById('totalLamps').innerText = Math.floor(1200 + Math.random()*200);
+            document.getElementById('powerSaved').innerHTML = (58 + Math.floor(Math.random()*10)) + '<span style="font-size:1.5rem;">%</span>';
+            document.getElementById('co2Saved').innerHTML = (1.2 + Math.random()*0.6).toFixed(2) + '<span style="font-size:1.2rem;"> طن</span>';
+            document.getElementById('omrSaved').innerHTML = (2900 + Math.floor(Math.random()*700)) + '<span style="font-size:1rem;"> ر.ع</span>';
+        }, 3500);
+    };
+
+    // تفاعل بسيط للمخطط: عند النقر على SVG نظهر رسالة (محاكاة تفاعلية)
+    document.getElementById('networkSvg')?.addEventListener('click', function(e) {
+        let target = e.target;
+        let info = '';
+        if (target.tagName === 'ellipse') info = 'الإنترنت - سحابة الاتصال';
+        else if (target.tagName === 'rect') info = target.textContent.includes('مودم') ? 'مودم متصل بالإنترنت' : 'بوابة IoT/موجه لاسلكي';
+        else if (target.tagName === 'circle') info = 'عمود إنارة مزود بلوح شمسي';
+        else if (target.tagName === 'polygon') info = 'لوح شمسي صغير';
+        else info = 'عنصر في الشبكة: ' + (target.textContent || 'مكون');
+        alert('🔍 تفاصيل: ' + info);
+    });
+
+    // ملء الشاشة
+    document.getElementById('fullscreenBtn').addEventListener('click', function() {
+        const wrapper = document.getElementById('networkWrapper');
+        if (wrapper.requestFullscreen) wrapper.requestFullscreen();
+        else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
+    });
+
+    // حماية التحميل بالرمز (6024 بدون عرض)
+    let currentFile = '';
+    function requestFile(type) {
+        currentFile = type;
+        document.getElementById('passwordModal').style.display = 'flex';
+    }
+    function closeModal() {
+        document.getElementById('passwordModal').style.display = 'none';
+        document.getElementById('passwordInput').value = '';
+    }
+    function verifyPassword() {
+        const pwd = document.getElementById('passwordInput').value;
+        if (pwd === '6024') {
+            closeModal();
+            let fileName = '';
+            if (currentFile === 'plan') fileName = 'المشروع_الأول_التخطيط.zip';
+            else if (currentFile === 'simfile') fileName = 'المشروع_الثاني_المحاكاة.zip';
+            else if (currentFile === 'pkt') fileName = 'packet_tracer_simulation.pkt';
+            alert(`تم التحقق. سيبدأ تحميل ${fileName} (رابط وهمي – قم باستبداله بملفاتك الحقيقية).`);
+        } else {
+            alert('الرمز غير صحيح. حاول مرة أخرى.');
+        }
+    }
+
+    window.requestFile = requestFile;
+    window.closeModal = closeModal;
+    window.verifyPassword = verifyPassword;
+</script>
+</body>
+</html>
