@@ -87,28 +87,21 @@
     <div class="container">
         <h1><i class="fas fa-lightbulb"></i> نظام إنارة الشوارع الذكي</h1>
         <div class="subhead">المشروع الثاني – محاكاة Cisco Packet Tracer</div>
+
         <div class="button-group">
-            <button class="btn btn-pkt" id="downloadPktBtn"><i class="fas fa-file-archive"></i> تحميل ملف المحاكاة (.pkt)</button>
-            <a href="explanation.html" class="btn"><i class="fas fa-file-pdf"></i> عرض الشرح الكامل</a>
+            <a href="https://drive.google.com/uc?export=download&id=1mKbFyaZkWdFm6CLiXh8JFB00z1ghtal7" 
+               class="btn btn-pkt">
+               <i class="fas fa-file-archive"></i> تحميل ملف المحاكاة (.pkt)
+            </a>
+
+            <a href="explanation.html" class="btn">
+                <i class="fas fa-file-pdf"></i> عرض الشرح الكامل
+            </a>
         </div>
+
         <div class="footer-note">
             <i class="fas fa-copyright"></i> إعداد: حامد خالد الناصري – 2026
         </div>
     </div>
-
-    <script>
-        document.getElementById('downloadPktBtn').addEventListener('click', function() {
-            const content = "هذا ملف محاكاة Cisco Packet Tracer لمشروع إنارة الشوارع الذكي.\n\nيحتوي على إعدادات الشبكة كما هو موضح في الشرح.";
-            const blob = new Blob([content], { type: 'application/octet-stream' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'Smart_Street_Lighting.pkt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        });
-    </script>
 </body>
 </html>
