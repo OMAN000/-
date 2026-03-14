@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محاكي الإنارة الذكي</title>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #000; }
+        #start-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, #02111f, #0b2b39);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000; color: white;
+        }
+        .start-card {
+            background: rgba(0, 20, 30, 0.95); border: 2px solid #f9c74f;
+            border-radius: 30px; padding: 3rem; text-align: center;
+            box-shadow: 0 0 50px rgba(249, 199, 79, 0.2); max-width: 500px;
+        }
+        .info-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px; padding: 1rem; margin: 1.5rem 0;
+            text-align: right; font-size: 0.9rem; line-height: 1.6;
+            border-right: 4px solid #f9c74f;
+        }
+        button { cursor: pointer; transition: 0.3s; }
+        #game-ui {
+            position: absolute; bottom: 20px; right: 20px;
+            background: rgba(0, 10, 20, 0.9); color: white;
+            border: 1px solid #f9c74f; border-radius: 20px;
+            padding: 1.2rem; width: 260px; z-index: 200; display: none;
+        }
+        .battery-container { display: flex; align-items: center; gap: 8px; margin: 10px 0; }
+        #battery-bar { flex: 1; height: 12px; background: #1a2a3a; border-radius: 10px; overflow: hidden; border: 1px solid #333; }
+        #battery-fill { height: 100%; width: 100%; background: #00ff88; box-shadow: 0 0 10px #00ff88; }
+        .btn-group { display: flex; flex-direction: column; gap: 8px; }
+        .control-btn {
+            background: #162a3d; color: #f9c74f; border: 1px solid #f9c74f;
+            padding: 10px; border-radius: 12px; font-size: 0.85rem; font-weight: bold;
+        }
+        .control-btn:hover { background: #f9c74f; color: #000; }
+        #time-status { font-size: 1.1rem; font-weight: bold; color: #f9c74f; text-align: center; margin-bottom: 5px; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div id="start-screen">
+        <div class="start-card">
+            <h1 style="color:#f9c74f; margin-top:0;">ENGINE SIMULATOR</h1>
+            <p>نظام محاكاة إدارة الطاقة والإنارة الذكية</p>
+            
+            <div class="info-box">
+                <div><i class="fas fa-grip-lines-vertical"></i> <strong>عدد الأعمدة:</strong> 40 عمود إنارة ذكي</div>
+                <div><i class="fas fa-solar-panel"></i> <strong>نظام الطاقة:</strong> ألواح شمسية مدمجة بكل عمود</div>
+                <div><i class="fas fa-microchip"></i> <strong>نوع الاستشعار:</strong> حساسات حركة (Motion Sensors)</div>
+                <div><i class="fas fa-battery-full"></i> <strong>تخزين الطاقة:</strong> بطاريات ليثيوم مستقلة</div>
+                <div><i class="fas fa-road"></i> <strong>البيئة:</strong> طريق سريع بنظام تعقب الكاميرا</div>
+            </div>
+
+            <button id="start-btn" style="background:#f9c74f; border:none; padding:1rem 3rem; border-radius:50px; font-weight:bold; font-size:1.2rem">دخول النظام</button>
+        </div>
+    </div>
+
+    <div id="game-ui">
+        <div id="time-status">☀️ نهار</div>
+        <div class="battery-container">
+            <span id="battery-percent">100%</span>
+            <div id="battery-bar"><div id="battery-fill"></div></div>
+            <span>🔋</span>
+        </div>
+        <div class="btn-group">
+            <button id="toggle-time" class="control-btn"><i class="fas fa-adjust"></i> تبديل الوقت</button>
+            <button id="toggle-camera" class="control-btn"><i class="fas fa-camera"></i> وضع الكاميرا</button>
+            <button id="toggle-auto" class="control-btn"><i class="fas fa-robot"></i> قيادة تلقائية</button>
+        </div>
+    </div>
+
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.128.0/build/three.module.js" } }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'https://unpkg.com/three@0.128.0/examples/jsm/controls/OrbitControls.js';
+
+        let scene, camera, renderer, controls, carGroup, lamps = [];
+        let isNight = false, freeCam = false, autoDrive = false;
+        let batteryLevel = 100, gameStarted = false;
+        let keys = { w: false, s: false, a: false, d: false };
+        let sunLight, hemiLight;
+
+        document.getElementById('start-btn').onclick = () => {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('game-ui').style.display = 'block';
+            gameStarted = true;
+            init();
+        };
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xaaccff);
+            scene.fog = new THREE.FogExp2(0xaaccff, 0.002);
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.body.appendChild(renderer.domElement);
+
+            sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            sunLight.position.set(100, 200, 100);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 2048;
+            sunLight.shadow.mapSize.height = 2048;
+            scene.add(sunLight);
+
+            hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+            scene.add(hemiLight);
+
+            const roadGroup = new THREE.Group();
+            const roadGeo = new THREE.PlaneGeometry(22, 2000);
+            const roadMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.8, metalness: 0.2 });
+            const road = new THREE.Mesh(roadGeo, roadMat);
+            road.rotation.x = -Math.PI / 2;
+            road.receiveShadow = true;
+            roadGroup.add(road);
+
+            for(let j=0; j<100; j++) {
+                const line = new THREE.Mesh(new THREE.PlaneGeometry(0.4, 5), new THREE.MeshBasicMaterial({color:0xffffff}));
+                line.rotation.x = -Math.PI/2;
+                line.position.set(0, 0.02, 500 - (j * 15));
+                roadGroup.add(line);
+            }
+            scene.add(roadGroup);
+
+            for (let i = 0; i < 40; i++) {
+                const z = 200 - i * 25;
+                const group = new THREE.Group();
+                group.position.set(12, 0, z);
+
+                const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.25, 10), new THREE.MeshStandardMaterial({color: 0x2c3e50}));
+                pole.position.y = 5;
+                group.add(pole);
+
+                const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 10), new THREE.MeshStandardMaterial({color: 0x2c3e50}));
+                arm.rotation.z = Math.PI/2;
+                arm.position.set(-5, 10, 0);
+                group.add(arm);
+
+                const solar = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.1, 1.8), new THREE.MeshStandardMaterial({color: 0x001a33, metalness:0.8}));
+                solar.position.set(0, 10.3, 0);
+                solar.rotation.x = 0.4;
+                group.add(solar);
+
+                const batt = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.5), new THREE.MeshStandardMaterial({color: 0x333333}));
+                batt.position.set(0.5, 4, 0);
+                group.add(batt);
+
+                const light = new THREE.PointLight(0xfff9e0, 0, 30, 2);
+                light.position.set(-9, 9.5, 0);
+                group.add(light);
+
+                const head = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.4, 1.2), new THREE.MeshStandardMaterial({color: 0x111111}));
+                head.position.set(-9, 9.8, 0);
+                group.add(head);
+
+                scene.add(group);
+                lamps.push({ light, z: z });
+            }
+
+            carGroup = new THREE.Group();
+            const carBody = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.6, 5), new THREE.MeshStandardMaterial({color: 0xffcc00, metalness:0.5, roughness:0.2}));
+            carBody.position.y = 0.6;
+            carGroup.add(carBody);
+
+            const carCabin = new THREE.Mesh(new THREE.BoxGeometry(2, 0.6, 2.5), new THREE.MeshStandardMaterial({color: 0x000000, transparent:true, opacity:0.8}));
+            carCabin.position.set(0, 1.1, -0.5);
+            carGroup.add(carCabin);
+
+            const spoiler = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.1, 0.5), new THREE.MeshStandardMaterial({color: 0x222222}));
+            spoiler.position.set(0, 1.3, 2.2);
+            carGroup.add(spoiler);
+
+            const wheelGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.5, 24);
+            const wheelMat = new THREE.MeshStandardMaterial({color: 0x050505});
+            const wheelPos = [[-1.2, 0.5, 1.6], [1.2, 0.5, 1.6], [-1.2, 0.5, -1.6], [1.2, 0.5, -1.6]];
+            wheelPos.forEach(p => {
+                const w = new THREE.Mesh(wheelGeo, wheelMat);
+                w.rotation.z = Math.PI/2;
+                w.position.set(p[0], p[1], p[2]);
+                carGroup.add(w);
+            });
+
+            carGroup.position.set(4, 0, 150);
+            scene.add(carGroup);
+
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enabled = false;
+
+            window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+            window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+            document.getElementById('toggle-time').onclick = () => {
+                isNight = !isNight;
+                document.getElementById('time-status').innerText = isNight ? "🌙 ليل" : "☀️ نهار";
+                scene.background = new THREE.Color(isNight ? 0x01050a : 0xaaccff);
+                scene.fog.color = new THREE.Color(isNight ? 0x01050a : 0xaaccff);
+                sunLight.intensity = isNight ? 0.02 : 1.5;
+                hemiLight.intensity = isNight ? 0.05 : 0.6;
+            };
+
+            document.getElementById('toggle-camera').onclick = () => { freeCam = !freeCam; controls.enabled = freeCam; };
+            document.getElementById('toggle-auto').onclick = () => { autoDrive = !autoDrive; };
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (!gameStarted) return;
+
+            if (autoDrive) {
+                carGroup.position.z -= 0.4;
+                if (carGroup.position.z < -600) carGroup.position.z = 200;
+            } else {
+                if (keys.w || keys.arrowup) carGroup.position.z -= 0.8;
+                if (keys.s || keys.arrowdown) carGroup.position.z += 0.8;
+                if (keys.a || keys.arrowleft) carGroup.position.x -= 0.25;
+                if (keys.d || keys.arrowright) carGroup.position.x += 0.25;
+            }
+
+            if (!freeCam) {
+                camera.position.lerp(new THREE.Vector3(carGroup.position.x + 15, 10, carGroup.position.z + 20), 0.1);
+                camera.lookAt(carGroup.position);
+            }
+
+            let activeCount = 0;
+            lamps.forEach(lamp => {
+                const dist = Math.abs(carGroup.position.z - lamp.z);
+                if (isNight && dist < 20) {
+                    lamp.light.intensity = 3;
+                    activeCount++;
+                } else {
+                    lamp.light.intensity = 0.1;
+                }
+            });
+
+            if (isNight) { batteryLevel -= (activeCount * 0.004); } 
+            else { batteryLevel += 0.06; }
+            batteryLevel = Math.min(100, Math.max(0, batteryLevel));
+
+            const fill = document.getElementById('battery-fill');
+            fill.style.width = batteryLevel + '%';
+            fill.style.background = batteryLevel < 20 ? '#ff3333' : '#00ff88';
+            document.getElementById('battery-percent').innerText = Math.floor(batteryLevel) + '%';
+
+            renderer.render(scene, camera);
+        }
+
+        window.onresize = () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        };
+    </script>
+</body>
+</html>
