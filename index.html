@@ -598,19 +598,31 @@
         document.getElementById('passwordModal').style.display = 'none';
         document.getElementById('passwordInput').value = '';
     }
-    function verifyPassword() {
-        const pwd = document.getElementById('passwordInput').value;
-        if (pwd === '6024') {
-            closeModal();
-            let fileName = '';
-            if (currentFile === 'plan') fileName = 'المشروع_الأول_التخطيط.zip';
-            else if (currentFile === 'simfile') fileName = 'المشروع_الثاني_المحاكاة.zip';
-            else if (currentFile === 'pkt') fileName = 'packet_tracer_simulation.pkt';
-            alert(`تم التحقق. سيبدأ تحميل ${fileName} (رابط وهمي – قم باستبداله بملفاتك الحقيقية).`);
-        } else {
-            alert('الرمز غير صحيح. حاول مرة أخرى.');
+   function verifyPassword() {
+    const pwd = document.getElementById('passwordInput').value;
+    if (pwd === '6024') {
+        closeModal();
+        let downloadUrl = '';
+        
+        // روابط انتقال للصفحات الأخرى ⬇️
+        if (currentFile === 'plan') {
+            downloadUrl = 'https://github.com/OMAN000/-/fi1.html';
+        } 
+        else if (currentFile === 'simfile') {
+            downloadUrl = 'https://github.com/OMAN000/-/blob/main/page2.html';
+        } 
+        else if (currentFile === 'pkt') {
+            downloadUrl = 'https://github.com/OMAN000/-/blob/main/page3.html';
         }
+        
+        // الانتقال للصفحة
+        if (downloadUrl) {
+            window.location.href = downloadUrl;
+        }
+    } else {
+        alert('الرمز غير صحيح. حاول مرة أخرى.');
     }
+}
 
     window.requestFile = requestFile;
     window.closeModal = closeModal;
