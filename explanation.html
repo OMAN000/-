@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شرح نظام إنارة الشوارع الذكي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Amiri', Tahoma, sans-serif;
+        }
+        body {
+            background: #f0f5fa;
+            padding: 30px 20px;
+            color: #05445e;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 70px;
+            box-shadow: 0 25px 50px -10px rgba(0, 50, 70, 0.2);
+            padding: 3rem;
+            border: 3px solid #ffb347;
+        }
+        h1 {
+            font-size: 3rem;
+            color: #126b7e;
+            border-right: 15px solid #ffb347;
+            padding-right: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        h1 i { color: #ffb347; }
+        .subhead {
+            font-size: 1.4rem;
+            color: #1f7a8c;
+            margin-bottom: 30px;
+        }
+        .btn-pdf {
+            background: #126b7e;
+            color: white;
+            border: none;
+            border-radius: 60px;
+            padding: 15px 30px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #0a4a5a;
+            transition: 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            border: 3px solid white;
+            margin-bottom: 30px;
+        }
+        .btn-pdf:active { transform: translateY(5px); box-shadow: 0 3px 0 #0a4a5a; }
+        .section {
+            background: #fef9ef;
+            border-radius: 50px;
+            padding: 2.5rem;
+            margin: 40px 0;
+            border: 3px solid #ffd966;
+        }
+        .section h2 {
+            font-size: 2.2rem;
+            color: #126b7e;
+            border-right: 12px solid #ffb347;
+            padding-right: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section h2 i { color: #ffb347; }
+        .phase {
+            background: white;
+            border-radius: 40px;
+            padding: 2rem;
+            margin: 30px 0;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+            border-right: 10px solid #ffb347;
+        }
+        .phase h3 {
+            font-size: 1.9rem;
+            color: #1f7a8c;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .phase h3 i { color: #ffb347; }
+        .phase ul, .phase ol { padding-right: 40px; font-size: 1.2rem; margin: 15px 0; }
+        .phase li { margin: 10px 0; }
+        .diagram {
+            background: #e1f0fa;
+            border-radius: 40px;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .diagram svg {
+            max-width: 100%;
+            height: auto;
+            background: white;
+            padding: 15px;
+            border-radius: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            margin: 25px 0;
+            box-shadow: 0 8px 15px #d4d0c0;
+        }
+        th { background: #126b7e; color: white; padding: 15px; font-size: 1.2rem; }
+        td { padding: 12px; border-bottom: 1px solid #cbdae5; font-size: 1.1rem; }
+        .note {
+            background: #fff3cd;
+            border-right: 8px solid #ffb347;
+            padding: 20px;
+            border-radius: 40px;
+            margin: 30px 0;
+            font-size: 1.2rem;
+        }
+        .device-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .device-item {
+            background: white;
+            border-radius: 30px;
+            padding: 15px;
+            border: 2px solid #ffd966;
+            text-align: center;
+        }
+        footer {
+            text-align: center;
+            color: #126b7e;
+            margin-top: 50px;
+            font-size: 1.1rem;
+        }
+        kbd {
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 2px 8px;
+            font-family: monospace;
+        }
+        @media print {
+            .btn-pdf { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="explanationContent">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1><i class="fas fa-lightbulb"></i> نظام إنارة الشوارع الذكي</h1>
+            <button class="btn-pdf" id="downloadPdfBtn"><i class="fas fa-file-pdf"></i> تحميل الشرح PDF</button>
+        </div>
+        <div class="subhead">شرح تنفيذ المحاكاة باستخدام Cisco Packet Tracer – الخطوات الكاملة</div>
+
+        <!-- المكونات -->
+        <div class="section">
+            <h2><i class="fas fa-boxes"></i> المكونات والأجهزة المستخدمة</h2>
+            <div class="device-list">
+                <div class="device-item"><i class="fas fa-desktop fa-2x" style="color:#ffb347;"></i><br><strong>Control PC</strong><br>جهاز تحكم مركزي</div>
+                <div class="device-item"><i class="fas fa-ethernet fa-2x" style="color:#ffb347;"></i><br><strong>Switch 2960</strong><br>مبدل لتوصيل الأجهزة</div>
+                <div class="device-item"><i class="fas fa-server fa-2x" style="color:#ffb347;"></i><br><strong>أعمدة إنارة</strong><br>تمثل بواسطة Generic Server</div>
+                <div class="device-item"><i class="fas fa-video fa-2x" style="color:#ffb347;"></i><br><strong>كاميرا IP</strong><br>(اختياري – للمراقبة)</div>
+                <div class="device-item"><i class="fas fa-person-walking fa-2x" style="color:#ffb347;"></i><br><strong>مستشعر حركة</strong><br>يمكن تمثيله بـ Switch</div>
+            </div>
+        </div>
+
+        <!-- مخطط الشبكة -->
+        <div class="section">
+            <h2><i class="fas fa-network-wired"></i> مخطط الشبكة</h2>
+            <div class="diagram">
+                <svg viewBox="0 0 700 250" width="100%">
+                    <rect x="50" y="90" width="100" height="50" rx="15" fill="#9dc1d9" />
+                    <text x="70" y="125" fill="#126b7e" font-size="14">Control PC</text>
+                    <rect x="220" y="70" width="100" height="60" rx="15" fill="#9fa9b5" />
+                    <text x="250" y="110" fill="white" font-size="14">Switch</text>
+                    <circle cx="400" cy="50" r="25" fill="#1e6d8f"/><text x="375" y="60" fill="white">Lamp1</text>
+                    <circle cx="480" cy="130" r="25" fill="#1e6d8f"/><text x="455" y="140" fill="white">Lamp2</text>
+                    <circle cx="560" cy="200" r="25" fill="#1e6d8f"/><text x="535" y="210" fill="white">Lamp3</text>
+                    <rect x="380" y="180" width="40" height="30" rx="8" fill="#b8a2c6" />
+                    <text x="380" y="225" fill="#126b7e">كاميرا</text>
+                    <circle cx="450" y="180" r="15" fill="#a4c3d9"/><text x="430" y="190" fill="#126b7e">Motion</text>
+                    <line x1="150" y1="115" x2="220" y2="100" stroke="#333" stroke-width="2"/>
+                    <line x1="320" y1="100" x2="380" y2="60" stroke="#333" stroke-width="2"/>
+                    <line x1="320" y1="100" x2="460" y2="130" stroke="#333" stroke-width="2"/>
+                    <line x1="320" y1="100" x2="540" y2="200" stroke="#333" stroke-width="2"/>
+                    <line x1="400" y1="75" x2="400" y2="170" stroke="#333" stroke-width="2" stroke-dasharray="4"/>
+                </svg>
+            </div>
+            <p style="text-align:center;">جميع الأجهزة متصلة عبر Switch باستخدام كابلات نحاسية مباشرة.</p>
+        </div>
+
+        <!-- خطوات التنفيذ -->
+        <div class="section">
+            <h2><i class="fas fa-list-ol"></i> خطوات التنفيذ (7 مراحل)</h2>
+
+            <div class="phase">
+                <h3><i class="fas fa-1-circle"></i> المرحلة 1: تجهيز البيئة الأساسية</h3>
+                <ol>
+                    <li><strong>افتح Cisco Packet Tracer</strong> وأنشئ ملفًا جديدًا.</li>
+                    <li><strong>أضف جهاز تحكم مركزي (Control PC):</strong> من <kbd>End Devices → Generic PC</kbd>.</li>
+                    <li><strong>أضف Switch:</strong> من <kbd>Network Devices → Switches → 2960 Switch</kbd>.</li>
+                    <li><strong>أضف أعمدة الإنارة الذكية:</strong> استخدم <kbd>Generic Server</kbd> لكل عمود (يمكنك تغيير الأيقونة لاحقاً).</li>
+                    <li><strong>أضف كاميرا مراقبة (اختياري):</strong> استخدم <kbd>IP Camera</kbd>.</li>
+                </ol>
+            </div>
+
+            <div class="phase">
+                <h3><i class="fas fa-2-circle"></i> المرحلة 2: توصيل الشبكة</h3>
+                <ol>
+                    <li>اربط <strong>Control PC → Switch</strong> باستخدام <kbd>Copper Straight-Through Cable</kbd>.</li>
+                    <li>اربط <strong>كل عمود إنارة → Switch</strong> بنفس الكابل.</li>
+                    <li>إذا أضفت كاميرا، اربطها أيضًا بـ Switch.</li>
+                    <li><strong>قم بإعطاء كل جهاز IP ثابت:</strong>
+                        <ul>
+                            <li>Control PC: <kbd>192.168.1.10</kbd></li>
+                            <li>Lamp_1: <kbd>192.168.1.101</kbd></li>
+                            <li>Lamp_2: <kbd>192.168.1.102</kbd></li>
+                            <li>Lamp_3: <kbd>192.168.1.103</kbd> ... وهكذا</li>
+                            <li>Subnet Mask: <kbd>255.255.255.0</kbd> للجميع.</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="phase">
+                <h3><i class="fas fa-3-circle"></i> المرحلة 3: إعداد أعمدة الإنارة</h3>
+                <ol>
+                    <li>اضغط على كل عمود → <kbd>Desktop → Config → On/Off</kbd> (يمثل حالة التشغيل).</li>
+                    <li>استخدم <kbd>Simulation → Add Event</kbd> لإنشاء أحداث تشغيل/إطفاء حسب جدول زمني (مثلاً تشغيل عند الغسق).</li>
+                </ol>
+            </div>
+
+            <div class="phase">
+                <h3><i class="fas fa-4-circle"></i> المرحلة 4: إضافة مستشعر الحركة</h3>
+                <ol>
+                    <li>أضف <kbd>Motion Sensor</kbd> أو <kbd>Switch</kbd> من قائمة <kbd>Components</kbd> لكل عمود.</li>
+                    <li>اربطه بالعمود بحيث: عند تفعيل المستشعر (محاكاة حركة) يضيء العمود، وبعد انتهاء الحركة ينطفئ بعد فترة.</li>
+                    <li>يمكن تحقيق ذلك باستخدام حدث: "Motion Detected → Turn On Lamp" و "No Motion → Turn Off after 10s".</li>
+                </ol>
+            </div>
+
+            <div class="phase">
+                <h3><i class="fas fa-5-circle"></i> المرحلة 5: إنشاء لوحة التحكم المركزية</h3>
+                <ol>
+                    <li>في Control PC → <kbd>Desktop → Command Prompt</kbd>، استخدم <kbd>ping 192.168.1.101</kbd> للتأكد من الاتصال.</li>
+                    <li>يمكن إنشاء جدول تشغيل مركزي عبر <kbd>Simulation → Add Event</kbd> يتحكم في جميع الأعمدة.</li>
+                    <li>للكاميرا: يمكن ربطها بالـ PC لعرض الحركة (اختياري).</li>
+                </ol>
+            </div>
+
+            <div class="phase">
+                <h3><i class="fas fa-6-circle"></i> المرحلة 6: تجربة النظام</h3>
+                <ol>
+                    <li>فعّل <kbd>Simulation Mode</kbd> من شريط الأدوات.</li>
+                    <li>جرب:
+                        <ul>
+                            <li>تشغيل/إيقاف الأعمدة يدويًا من Control PC (باستخدام الأحداث).</li>
+                            <li>تفعيل مستشعر الحركة → يجب أن يضيء العمود.</li>
+                            <li>راقب استجابة الكاميرا إن وجدت.</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="phase">
+                <h3><i class="fas fa-7-circle"></i> المرحلة 7: تحسين المحاكاة</h3>
+                <ol>
+                    <li><strong>أضف جدول زمني للتشغيل الليلي:</strong> من <kbd>Simulation → Events</kbd>، أضف حدث On/Off لكل عمود حسب الوقت (مثلاً On 6pm, Off 6am).</li>
+                    <li><strong>أضف Dashboard بسيط:</strong> يمكن إنشاء صفحة HTML بسيطة على Control PC تعرض حالة الأعمدة.</li>
+                    <li><strong>قسّم الشارع إلى مناطق</strong> لتسهيل الإدارة.</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- جدول عناوين IP -->
+        <div class="section">
+            <h2><i class="fas fa-table"></i> جدول عناوين IP المقترحة</h2>
+            <table>
+                <tr><th>الجهاز</th><th>عنوان IP</th><th>قناع الشبكة</th></tr>
+                <tr><td>Control PC</td><td>192.168.1.10</td><td>255.255.255.0</td></tr>
+                <tr><td>Lamp 1</td><td>192.168.1.101</td><td>255.255.255.0</td></tr>
+                <tr><td>Lamp 2</td><td>192.168.1.102</td><td>255.255.255.0</td></tr>
+                <tr><td>Lamp 3</td><td>192.168.1.103</td><td>255.255.255.0</td></tr>
+                <tr><td>كاميرا (اختياري)</td><td>192.168.1.50</td><td>255.255.255.0</td></tr>
+            </table>
+        </div>
+
+        <!-- نصائح -->
+        <div class="note">
+            <i class="fas fa-lightbulb" style="color:#ffb347; font-size:2rem; margin-left:15px;"></i>
+            <strong>💡 نصيحة للتسهيل:</strong>
+            <ul style="margin-top:10px;">
+                <li>كل عمود إنارة = <kbd>Generic Server</kbd> (يمكن تغيير الأيقونة لتصبح كعمود إنارة من <kbd>Config → Icon</kbd>).</li>
+                <li>مستشعر الحركة = <kbd>Motion Sensor</kbd> أو <kbd>Switch</kbd> صغير.</li>
+                <li>التحكم الذكي = <kbd>Events</kbd> + <kbd>جدول زمني</kbd>.</li>
+                <li>استخدم أسماء واضحة للأجهزة لتسهيل إدارة الأحداث.</li>
+            </ul>
+        </div>
+
+        <footer>
+            <i class="fas fa-copyright"></i> إعداد: حامد خالد الناصري – 2026 | جميع الحقوق محفوظة
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('downloadPdfBtn').addEventListener('click', function() {
+            const element = document.getElementById('explanationContent');
+            const opt = {
+                margin:        [0.7, 0.7, 0.7, 0.7],
+                filename:     'شرح_نظام_إنارة_الشوارع_الذكي.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, letterRendering: true, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        });
+    </script>
+</body>
+</html>
