@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقرير المشروع الأول: نظام إنارة الشوارع الذكي</title>
+    <!-- مكتبة لتحويل HTML إلى PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #eef3f7;
+            font-family: 'Segoe UI', 'Amiri', Tahoma, Arial, sans-serif;
+            padding: 30px 15px;
+            color: #022b40;
+            direction: rtl;
+        }
+        .report-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 50px;
+            box-shadow: 0 25px 50px -10px #1f3a4b;
+            padding: 3rem 3.5rem;
+            border: 1px solid #bfd9e8;
+            position: relative;
+        }
+        .pdf-button {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 25px;
+        }
+        .btn-pdf {
+            background: #c5283d;
+            color: white;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 35px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #731c29;
+            transition: 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            border: 2px solid #ffbaba;
+        }
+        .btn-pdf:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #731c29;
+        }
+        .btn-pdf i {
+            font-size: 1.5rem;
+        }
+        .report-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 4px solid #f9c74f;
+            padding-bottom: 1.5rem;
+        }
+        .report-title h1 {
+            font-size: 2.8rem;
+            color: #0a3142;
+            font-weight: 800;
+        }
+        .report-title h2 {
+            font-size: 2rem;
+            color: #1f5e7a;
+            margin-top: 0.3rem;
+        }
+        .report-title .sub {
+            font-size: 1.2rem;
+            color: #3a6d8c;
+            margin-top: 0.8rem;
+        }
+        .section {
+            margin: 2.8rem 0;
+        }
+        .section-head {
+            font-size: 2rem;
+            font-weight: 700;
+            border-right: 12px solid #f9c74f;
+            padding-right: 1.2rem;
+            margin-bottom: 1.8rem;
+            color: #053142;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-head i {
+            color: #f9c74f;
+            font-size: 2.2rem;
+        }
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.8rem;
+            margin: 1.5rem 0;
+        }
+        .problem-card {
+            background: #f1f8fe;
+            border-radius: 30px;
+            padding: 1.8rem 1.2rem;
+            border: 1px solid #c8dae9;
+            box-shadow: 0 8px 15px #b0c9da40;
+        }
+        .problem-card i {
+            font-size: 2.5rem;
+            color: #c5283d;
+            margin-bottom: 1rem;
+        }
+        .solution-badge {
+            background: #154a5e;
+            color: white;
+            border-radius: 50px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+        }
+        .data-table {
+            overflow-x: auto;
+            background: #f3faff;
+            border-radius: 40px;
+            padding: 1.5rem;
+            border: 2px solid #d4e5f2;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            background: white;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px #b9d2e3;
+        }
+        th {
+            background: #022b40;
+            color: white;
+            padding: 1.2rem 0.5rem;
+            font-size: 1.1rem;
+        }
+        td {
+            padding: 1rem 0.5rem;
+            border-bottom: 1px solid #bdd1df;
+        }
+        .source-note {
+            font-size: 0.9rem;
+            color: #3d6070;
+            margin-top: 1rem;
+            background: #eaf0f5;
+            padding: 0.8rem 1.5rem;
+            border-radius: 60px;
+        }
+        .network-diagram {
+            background: #cee2ef;
+            border-radius: 60px;
+            padding: 2rem;
+            text-align: center;
+            border: 3px dashed #2c6c8f;
+        }
+        .network-svg {
+            max-width: 100%;
+            height: auto;
+            background: #b9d6e9;
+            border-radius: 35px;
+            padding: 15px;
+        }
+        .footer-note {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #9bbdd0;
+            text-align: center;
+            color: #1a4c63;
+            font-size: 1.1rem;
+        }
+        ul {
+            padding-right: 2rem;
+            margin: 1rem 0;
+        }
+        li {
+            margin: 0.6rem 0;
+        }
+        hr {
+            border: 1px solid #bdd7e7;
+            margin: 2rem 0;
+        }
+        .badge {
+            background: #f9c74f;
+            padding: 0.3rem 1.5rem;
+            border-radius: 30px;
+            color: #022b40;
+            font-weight: bold;
+            display: inline-block;
+        }
+    </style>
+    <!-- Font Awesome للأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="pdf-button">
+        <button class="btn-pdf" id="downloadPDF">
+            <i class="fas fa-file-pdf"></i> تحميل التقرير PDF
+        </button>
+    </div>
+    <div id="reportContent" class="report-container">
+        <!-- عنوان التقرير -->
+        <div class="report-title">
+            <h1><i class="fas fa-lightbulb" style="color:#f9c74f;"></i> مشروع النظام البيئي الذكي</h1>
+            <h2>نظام إنارة الشوارع الذكي لتقليل استهلاك الطاقة</h2>
+            <div class="sub"><span class="badge">تخطيط شبكة ذكية</span> <i class="fas fa-solar-panel" style="margin-right: 20px;"></i> إنترنت الأشياء</div>
+        </div>
+
+        <!-- المقدمة (حسب المنهج) -->
+        <section class="section">
+            <div class="section-head"><i class="fas fa-feather"></i> <span>المقدمة</span></div>
+            <p style="font-size: 1.2rem; line-height: 1.8;">تُعدّ الاستدامة البيئية والإدارة الفعّالة للموارد من أبرز التحديات التي تواجه المدن الحديثة اليوم. وقد أسهمت التقنيات الحديثة، مثل إنترنت الأشياء (IoT)، في إحداث تحول جذري في طريقة إدارة البنية التحتية الحضرية، من خلال توفير بيانات لحظية وإتاحة التحكم الآلي. في هذا المشروع، نقدّم تخطيطاً متكاملاً لشبكة نظام إنارة شوارع ذكي يهدف إلى تقليل استهلاك الطاقة، وخفض التكاليف التشغيلية، وتحسين كفاءة الصيانة، بالاعتماد على الطاقة الشمسية وتقنيات الاستشعار الذكية.</p>
+        </section>
+
+        <!-- تعريف المشكلة (تقييم الاحتياجات) -->
+        <section class="section">
+            <div class="section-head"><i class="fas fa-exclamation-triangle"></i> <span>تعريف المشكلة (تقييم الاحتياجات)</span></div>
+            <div class="problem-grid">
+                <div class="problem-card"><i class="fas fa-bolt"></i><h3>هدر الطاقة</h3><p>تعمل الإنارة التقليدية بكامل طاقتها طوال الليل (12 ساعة) بغض النظر عن حركة المرور، مما يسبب استهلاكاً مفرطاً للكهرباء.</p></div>
+                <div class="problem-card"><i class="fas fa-money-bill-wave"></i><h3>ارتفاع التكاليف</h3><p>تشكل فواتير الكهرباء للإنارة العامة نسبة كبيرة (70%) من فاتورة البلدية، بالإضافة إلى تكاليف صيانة مرتفعة.</p></div>
+                <div class="problem-card"><i class="fas fa-clock"></i><h3>ضعف المراقبة</h3><p>عدم وجود مراقبة لحظية للأعطال يؤخر الإصلاحات (أيام) ويزيد الخسائر.</p></div>
+                <div class="problem-card"><i class="fas fa-cloud"></i><h3>بصمة كربونية</h3><p>الاعتماد على شبكات الكهرباء التقليدية ينتج انبعاثات عالية من CO₂.</p></div>
+            </div>
+        </section>
+
+        <!-- الحل المقترح -->
+        <section class="section">
+            <div class="section-head"><i class="fas fa-microchip"></i> <span>الحل المقترح: نظام إنارة الشوارع الذكي</span></div>
+            <div class="solution-badge">
+                <p style="font-size:1.3rem;"><i class="fas fa-solar-panel"></i> كل عمود إنارة مستقل يعمل بالطاقة الشمسية ومزوّد بـ:</p>
+                <ul style="font-size:1.1rem; columns:2;">
+                    <li><i class="fas fa-sun" style="color:#f9c74f;"></i> لوح شمسي + بطارية تخزين</li>
+                    <li><i class="fas fa-person-walking"></i> حساس حركة PIR/رادار</li>
+                    <li><i class="fas fa-lightbulb"></i> مصباح LED عالي الكفاءة</li>
+                    <li><i class="fas fa-wifi"></i> وحدة تحكم LoRa/4G</li>
+                    <li><i class="fas fa-microchip"></i> حساس ضوء LDR وحساس تيار</li>
+                    <li><i class="fas fa-cloud"></i> بوابة إنترنت الأشياء</li>
+                </ul>
+                <p style="margin-top:1.5rem;">آلية العمل: إضاءة منخفضة (30%) بشكل افتراضي، وعند اكتشاف حركة ترتفع إلى 100%، ثم تعود بعد المغادرة. يتم إرسال البيانات إلى منصة مركزية للصيانة التنبؤية.</p>
+            </div>
+        </section>
+
+        <!-- جمع المعلومات (دراسة الجدوى) -->
+        <section class="section">
+            <div class="section-head"><i class="fas fa-chart-bar"></i> <span>جمع المعلومات – دراسة الجدوى</span></div>
+            <div class="data-table">
+                <table>
+                    <tr><th>العامل / المؤشر</th><th>النظام التقليدي</th><th>النظام الذكي (مقترح)</th><th>المصدر</th></tr>
+                    <tr><td>استهلاك الطاقة السنوي (لكل عمود)</td><td>1752 ك.و.س</td><td>438 ك.و.س</td><td>CHZ Lighting</td></tr>
+                    <tr><td>نسبة توفير الطاقة</td><td>-</td><td>تصل إلى 75%</td><td>Tvilight (اليونان)</td></tr>
+                    <tr><td>تكاليف الصيانة السنوية (1000 عمود)</td><td>~25,000 ر.ع</td><td>~8,000 ر.ع</td><td>ADNLITE</td></tr>
+                    <tr><td>زمن اكتشاف العطل</td><td>7 أيام</td><td>أقل من 5 دقائق</td><td>ADNLITE</td></tr>
+                    <tr><td>خفض انبعاثات CO₂</td><td>خط الأساس</td><td>تخفيض 25-30%</td><td>مدينة لوس أنجلوس</td></tr>
+                </table>
+                <div class="source-note"><i class="fas fa-database"></i> تم جمع البيانات من مشاريع حقيقية (Telensa، Tvilight، Philips، IEEE) ودراسات موثوقة.</div>
+            </div>
+            <!-- جدوى اقتصادية مختصرة -->
+            <p style="margin-top:1.5rem; background:#edf5f9; padding:1rem 2rem; border-radius:50px;"><strong>فترة استرداد رأس المال التقديرية:</strong> 5 – 7 سنوات (بناءً على توفير الكهرباء والصيانة).</p>
+        </section>
+
+        <!-- تصميم بنية الشبكة -->
+        <section class="section">
+            <div class="section-head"><i class="fas fa-network-wired"></i> <span>تصميم بنية شبكة النظام</span></div>
+            <div class="network-diagram">
+                <svg class="network-svg" viewBox="0 0 600 210" style="width:100%; height:auto;">
+                    <!-- سحابة الانترنت -->
+                    <ellipse cx="70" cy="50" rx="50" ry="25" fill="#e3f0fa" stroke="#022b40" stroke-width="2"/>
+                    <text x="40" y="60" fill="#022b40" font-size="12">الإنترنت</text>
+                    <!-- مودم -->
+                    <rect x="150" y="35" width="60" height="30" rx="10" fill="#f9c74f"/>
+                    <text x="165" y="58" fill="#022b40">مودم</text>
+                    <!-- موجه + بوابة IoT -->
+                    <rect x="250" y="25" width="90" height="50" rx="15" fill="#9dc1d9"/>
+                    <text x="270" y="55" fill="#022b40">موجه/بوابة</text>
+                    <!-- أعمدة إنارة ذكية -->
+                    <circle cx="400" cy="40" r="22" fill="#1e6d8f"/><text x="380" y="48" fill="white">عمود1</text>
+                    <circle cx="480" cy="80" r="22" fill="#1e6d8f"/><text x="460" y="88" fill="white">عمود2</text>
+                    <circle cx="530" cy="140" r="22" fill="#1e6d8f"/><text x="510" y="148" fill="white">عمود3</text>
+                    <!-- لوحة تحكم -->
+                    <rect x="40" y="140" width="110" height="45" rx="20" fill="#9fa9b5"/>
+                    <text x="60" y="170" fill="#022b40">لوحة تحكم</text>
+                    <!-- خطوط التوصيل -->
+                    <line x1="120" y1="50" x2="150" y2="50" stroke="#333" stroke-width="2"/>
+                    <line x1="210" y1="50" x2="250" y2="50" stroke="#333" stroke-width="2"/>
+                    <line x1="340" y1="50" x2="378" y2="44" stroke="#333" stroke-width="2"/>
+                    <line x1="422" y1="60" x2="460" y2="80" stroke="#333" stroke-width="2" stroke-dasharray="4"/>
+                    <line x1="502" y1="100" x2="518" y2="130" stroke="#333" stroke-width="2" stroke-dasharray="4"/>
+                    <line x1="100" y1="140" x2="70" y2="80" stroke="#333" stroke-width="2"/>
+                </svg>
+                <p style="margin-top:1rem;"><i class="fas fa-wifi"></i> تتصل الأعمدة لاسلكياً بالبوابة (LoRa/4G)، والبوابة عبر المودم بالإنترنت. تتم المراقبة عبر جهاز لوحي أو حاسوب.</p>
+            </div>
+        </section>
+
+        <!-- الفوائد المتوقعة -->
+        <section class="section">
+            <div class="section-head"><i class="fas fa-seedling"></i> <span>الفوائد المتوقعة</span></div>
+            <ul style="font-size:1.2rem; background:#e1f0f8; border-radius: 50px; padding:2rem 3rem;">
+                <li><i class="fas fa-bolt" style="color:#f9c74f;"></i> <strong>توفير الطاقة:</strong> خفض استهلاك الكهرباء بنسبة 50-75%.</li>
+                <li><i class="fas fa-coins"></i> <strong>توفير التكاليف:</strong> تقليل فواتير الكهرباء والصيانة بنسبة تصل إلى 70%.</li>
+                <li><i class="fas fa-tools"></i> <strong>صيانة استباقية:</strong> اكتشاف الأعطال فوراً (أقل من 5 دقائق) وتقليل زمن الإصلاح.</li>
+                <li><i class="fas fa-cloud-sun"></i> <strong>استدامة بيئية:</strong> خفض انبعاثات CO₂ بآلاف الأطنان سنوياً.</li>
+                <li><i class="fas fa-city"></i> <strong>بنية تحتية للمستقبل:</strong> إمكانية إضافة خدمات (شحن سيارات، مراقبة جودة الهواء).</li>
+            </ul>
+        </section>
+
+        <!-- الخاتمة والمصادر -->
+        <section class="section">
+            <div class="section-head"><i class="fas fa-check-circle"></i> <span>الخاتمة</span></div>
+            <p style="font-size:1.2rem;">يقدم هذا المشروع نموذجاً متكاملاً لتخطيط نظام إنارة شوارع ذكي يلبي احتياجات المدن الحديثة. أظهر تحليل الجدوى أن النظام، رغم ارتفاع تكلفته الرأسمالية الأولية، يتمتع بفترة استرداد معقولة ويحقق وفورات تشغيلية كبيرة. نوصي بالانتقال إلى مرحلة المحاكاة (المشروع الثاني) لاختبار أداء الشبكة باستخدام Cisco Packet Tracer.</p>
+        </section>
+
+        <!-- المصادر والمراجع -->
+        <section class="section">
+            <div class="section-head"><i class="fas fa-book"></i> <span>المصادر والمراجع</span></div>
+            <div style="background:#e9f2f7; border-radius:50px; padding:2rem;">
+                <p>1. تقرير مشروع نظام إنارة الشوارع الذكي القائم على إنترنت الأشياء (IoT). (Scribd)</p>
+                <p>2. كيف تساهم مصابيح الشوارع بتقنية LED في مبادرات الشبكة الذكية؟ (CHZ Lighting)</p>
+                <p>3. دليل مصابيح الشوارع الذكية في نهاية المطاف: اكتشف جميع مزاياها. (ADNLITE)</p>
+                <p>4. إعداد دراسات جدوى الميزانية البلدية لمشاريع الشوارع التي تعمل بالطاقة الشمسية. (Queneng Lighting)</p>
+                <p>5. إضاءة الشوارع المتكيفة المدعومة بالذكاء الاصطناعي على الطريق السريع في اليونان. (Tvilight)</p>
+                <p>6. نظام إدارة إنارة الشوارع الذكية - مشروع مدينة لوس أنجلوس. (we-gov.org)</p>
+                <p>7. مصنع مخصص لمصنعي إنارة الشوارع المتكاملة. (BSW Light)</p>
+                <p>8. دليل مشروع إنارة الشوارع بالطاقة الشمسية. (مشروعنا)</p>
+            </div>
+        </section>
+
+        <!-- تذييل باسم الطالب (اختياري) -->
+        <div class="footer-note">
+            <i class="fas fa-user-graduate"></i> إعداد: حامد خالد الناصري | 2026 <br>
+            جميع البيانات مستندة إلى مصادر موثوقة (Telensa, Tvilight, IEEE)
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('downloadPDF').addEventListener('click', function () {
+            const element = document.getElementById('reportContent');
+            // خيارات متقدمة للتحويل إلى PDF
+            const opt = {
+                margin:        [0.5, 0.5, 0.5, 0.5], // هوامش بالبوصة
+                filename:     'مشروع_النظام_البيئي_الذكي_تقرير_الاول.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, letterRendering: true, useCORS: true, logging: false },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            // تنفيذ الحفظ
+            html2pdf().set(opt).from(element).save();
+        });
+    </script>
+    <!-- ملاحظة: تأكد من وجود اتصال بالإنترنت لتحميل المكتبات -->
+</body>
+</html>
